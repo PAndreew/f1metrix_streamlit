@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+
+/* --- General App Styling --- */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    color: #FF4B4B; /* Streamlit's default red color */
+}
+
+/* --- Specific Widget Styling --- */
+
+/* Style the slider bar color */
+.stSlider [data-baseweb="slider"] div[role="slider"] {
+    background-color: #1E90FF; /* A nice lighter blue */
+    color: #1E90FF;
+}
+
+.stSlider [data-baseweb="slider"] div[role="slider"] > :first-child {
+    color: #1E90FF;
+}
+
+
+
+/* Style the dropdown (selectbox) widget */
+.stSelectbox div[data-baseweb="select"] > div {
+    background-color: #2F4F4F; /* Dark Slate Gray */
+    color: #FFFFFF;
+}
+
+/* Style the progress bar to keep it red */
+.stProgress > div > div > div > div {
+    background-color: #FF4B4B;
+}
+
+/* This is the CSS you provided for radio buttons, it works well! */
+div.row-widget.stRadio > div {
+    flex-direction: row;
+    align-items: stretch;
+}

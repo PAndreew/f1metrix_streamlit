@@ -1,0 +1,10 @@
+[theme]
+font = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+headingFont = "Orbitron:https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap"
+backgroundColor = "black"
+textColor = "white"
+
+[theme.sidebar]
+font = "Orbitron:https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap"
+backgroundColor = "white"
+textColor = "black"
