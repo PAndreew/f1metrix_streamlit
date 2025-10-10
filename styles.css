@@ -1,10 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
-
 /* --- General App Styling --- */
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Orbitron', sans-serif;
-    color: #FF4B4B; /* Streamlit's default red color */
 }
 
 /* --- Specific Widget Styling --- */
@@ -13,6 +10,23 @@ h1, h2, h3, h4, h5, h6 {
 .stSlider [data-baseweb="slider"] div[role="slider"] {
     background-color: #1E90FF; /* A nice lighter blue */
     color: #1E90FF;
+}
+
+.stTabs [role="tab"] button {
+    font-family: 'Orbitron';
+}
+
+.stTabs [role="tab"][aria-selected="true"] {
+    color: #1E90FF; /* Your desired highlight color for the text */
+    font-weight: bold;
+}
+
+.stTabs [data-baseweb="tab-highlight"] {
+    background-color: #1E90FF; /* Your desired highlight color for the underline */
+}
+
+.stTabs [role="tab"]:hover {
+    color: #489ceb; /* A slightly lighter shade for hover */
 }
 
 .stSlider [data-baseweb="slider"] div[role="slider"] > :first-child {
