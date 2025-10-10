@@ -96,7 +96,8 @@ def read_markdown_file(markdown_file):
         return f.read()
 
 # --- Main App ---
-st.title("F1 Metrix - A Formula 1 Data Analytics Blog")
+st.title("F1 Metrix")
+st.header("A Formula 1 Data Analytics Blog")
 
 # --- Tab Implementation ---
 blog_tab, dataviz_tab = st.tabs(["📝 Blog Posts", "📊 Data Visualizations"])
