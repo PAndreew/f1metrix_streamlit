@@ -2,7 +2,7 @@
 **Let’s start with several disclaimers.**
 1) Yes, it’s a ripoff of the fantastic [f1metrics](https://f1metrics.wordpress.com/) blog by Dr. Andrew Philips which is sadly abandoned.
 2) I’m not a PHD level statistician, only a hobbyist. In fact I’d be immensely grateful if someone could review my model/script.
-3) Yes, I use Gemini 1.5 Pro to support me - it still took surprisingly long to get here, and it’s far from finished…
+3) Yes, I use Gemini 2.5 Pro to support me - it still took surprisingly long to get here, and it’s far from finished…
 4) The underlying model is a slightly modified amalgamation of [Dr. Andrew Bell et als. work](https://research-information.bris.ac.uk/ws/portalfiles/portal/70290855/F1_paper_Mar16.pdf) and Dr. Andrew Philips’ updated model.
 I fetched the training data from [f1db](https://github.com/f1db) - thank you for their hard work!
 
@@ -38,9 +38,10 @@ Because drivers like Prost, Senna, and Schumacher drove some of the most dominan
 #### From Statistics to the Track: What +0.3 u0 Means in a Race
 So, how do we translate Prost's u0 of +0.3 into something meaningful on track? We can run a thought experiment.
 The Scenario: Take a perfectly average midfield car. On its own, with a perfectly average driver (u0 = 0.0), this car is quick enough to qualify and finish in 10th place.
-The Logic:
+##### The Logic:
 The key is understanding the distribution of performance in the midfield. The performance gaps are incredibly small. A few tenths of a second per lap separate multiple positions.
-Establish the Scale: In a typical F1 race, the standard deviation of our rankit_points performance metric is roughly 0.8 to 1.0. This means a driver performing at +1.0 is significantly ahead of the pack.
+
+In a typical F1 race, the standard deviation of our `rankit_points` performance metric is roughly 0.8 to 1.0. This means a driver performing at +1.0 is significantly ahead of the pack.
 Map Performance to Position: In the tightly packed midfield, a small gain in performance score leads to a significant gain in position. A performance score of +0.1 might secure 10th, +0.2 might be good for 9th, +0.3 for 8th, and +0.4 for 7th.
 Apply the Talent Bonus: Our average driver in the average car puts in a performance that gets them to 10th place. Prost, with his innate +0.3 skill advantage, elevates that entire package. His personal input adds +0.3 to the final performance score. This is enough to leapfrog the small gaps in the midfield.
 Instead of finishing 10th, his talent pushes the car up to an expected finishing position of around 7th place. Therefore, we can conclude that a u0 skill advantage of +0.3 is worth approximately 2-3 positions per race in an average car.
