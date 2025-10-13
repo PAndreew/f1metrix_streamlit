@@ -58,11 +58,11 @@ def load_data(table_name):
 # --- NEW: Specific Data Loading for Red Bull Post ---
 @st.cache_data
 def get_all_time_skill_data(_engine):
-    """Fetches all-time conservative skill rankings for specific drivers."""
+    """Fetches all-time conservative and mean skill rankings for specific drivers."""
     query = text("""
         SELECT forename, surname, u0_skill_mean, u0_skill_lower_bound, race_count 
         FROM driver_all_time_u0_ranking_conservative 
-        WHERE surname IN ('Pérez', 'Lawson', 'Tsunoda', 'Hadjar') 
+        WHERE driverid IN ('sergio-perez', 'liam-lawson', 'yuki-tsunoda', 'isack-hadjar', 'max-verstappen')
         ORDER BY u0_skill_lower_bound DESC;
     """)
     with _engine.connect() as conn:
@@ -73,11 +73,11 @@ def get_all_time_skill_data(_engine):
 
 @st.cache_data
 def get_yearly_skill_data(_engine):
-    """Fetches yearly skill scores for Pérez and Tsunoda."""
+    """Fetches yearly skill scores for Pérez, Tsunoda and Lawson."""
     query = text("""
         SELECT year, forename, surname, yearly_pure_skill_score, yearly_rank 
         FROM driver_yearly_pure_skill_rankings 
-        WHERE surname IN ('Pérez', 'Tsunoda') AND year >= 2021
+        WHERE driverid IN ('sergio-perez', 'yuki-tsunoda', 'liam-lawson') AND year >= 2021
         ORDER BY surname, year;
     """)
     with _engine.connect() as conn:
@@ -88,13 +88,26 @@ def get_yearly_skill_data(_engine):
 
 @st.cache_data
 def get_poe_data(_engine):
-    """Fetches average performance over expectation for specific drivers."""
+    """
+    Fetches the average performance over expectation for specific drivers for each
+    year between 2021 and 2024.
+    """
     query = text("""
-        SELECT forename, surname, AVG(performance_over_expectation) as average_poe, COUNT(raceid) as race_count 
-        FROM driver_performance_over_expectation 
-        WHERE surname IN ('Pérez', 'Lawson', 'Tsunoda', 'Hadjar') 
-        GROUP BY forename, surname 
-        ORDER BY average_poe DESC;
+        SELECT 
+            forename, 
+            surname, 
+            year, 
+            AVG(performance_over_expectation) as average_poe, 
+            COUNT(raceid) as race_count 
+        FROM 
+            driver_performance_over_expectation 
+        WHERE 
+            driverid IN ('sergio-perez', 'liam-lawson', 'yuki-tsunoda', 'isack-hadjar', 'max-verstappen') 
+            AND year BETWEEN 2021 AND 2025
+        GROUP BY 
+            forename, surname, year
+        ORDER BY 
+            surname, year;
     """)
     with _engine.connect() as conn:
         df = pd.read_sql(query, conn)
@@ -102,21 +115,103 @@ def get_poe_data(_engine):
         df['full_name'] = df['forename'] + ' ' + df['surname']
     return df
 
+# 2. --- REBUILT Plotting Function ---
+# This function is now designed to create a line chart showing trends over time.
+def plot_yearly_poe_trend(df):
+    """
+    Generates a line chart showing the yearly trend of 'Performance Over Expectation'.
+    """
+    # Create the line chart with markers for each data point (each year)
+
+    df = df.sort_values('year')
+
+    fig = px.line(df, 
+                  x='year', 
+                  y='average_poe', 
+                  color='full_name',  # Creates a separate line for each driver
+                  title="Yearly Trend: Performance Over Expectation (POE)",
+                  labels={
+                      "year": "Season", 
+                      "average_poe": "Average POE (Higher is Better)", 
+                      "full_name": "Driver"
+                  },
+                  markers=True, # Adds a dot for each year's data point
+                  hover_data=['race_count']) # Show race count on hover
+    
+    # Add a crucial horizontal line at y=0. Points above are over-performing, below are under-performing.
+    fig.add_hline(y=0, line_dash="dash", line_color="grey", 
+                  annotation_text="Expectation Baseline", annotation_position="bottom right")
+    
+    # Ensure the x-axis ticks are set for each year and not as a continuous float (e.g., no "2021.5")
+    fig.update_xaxes(type='category')
+    
+    # Apply standard dark theme styling
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    
+    return fig
+
 # --- NEW: Plotting Functions for Red Bull Post ---
 def plot_all_time_skill(df):
-    """Generates the all-time skill comparison bar chart."""
-    fig = px.bar(df, 
-                 x='u0_skill_lower_bound', 
-                 y='full_name', 
-                 orientation='h',
-                 title="All-Time Driver Skill: Conservative Estimate",
-                 labels={"u0_skill_lower_bound": "Conservative Skill Score", "full_name": "Driver"},
-                 hover_data=['race_count', 'u0_skill_mean'],
-                 text='u0_skill_lower_bound')
-    fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
-    fig.update_layout(yaxis={'categoryorder':'total ascending'}, 
-                      uniformtext_minsize=8, uniformtext_mode='hide',
-                      paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    """
+    Generates a stacked bar chart showing the conservative (lower bound) and mean
+    all-time skill estimates.
+    """
+    # Sort the dataframe by the mean skill for a clear visual hierarchy in the plot
+    df = df.sort_values(by="u0_skill_mean", ascending=True)
+
+    # Calculate the difference between the mean and the lower bound.
+    # This will be the second (lighter) part of our stacked bar.
+    df['skill_upside'] = df['u0_skill_mean'] - df['u0_skill_lower_bound']
+
+    fig = go.Figure()
+
+    # Add the base of the bar: The Conservative Skill Score
+    fig.add_trace(go.Bar(
+        y=df['full_name'],
+        x=df['u0_skill_lower_bound'],
+        name='Conservative Skill (Lower Bound)',
+        orientation='h',
+        marker_color="#000000",  # A distinct blue color
+        hovertemplate=(
+            "<b>%{y}</b><br>" +
+            "Conservative Skill: %{x:.3f}<br>" +
+            "Mean Skill: %{customdata[0]:.3f}<br>" +
+            "Race Count: %{customdata[1]}" +
+            "<extra></extra>" # Hides the trace name on hover
+        ),
+        customdata=df[['u0_skill_mean', 'race_count']]
+    ))
+
+    # Add the top part of the bar: The 'upside' from the lower bound to the mean
+    fig.add_trace(go.Bar(
+        y=df['full_name'],
+        x=df['skill_upside'],
+        name='Potential to Mean',
+        orientation='h',
+        marker_color='#aec7e8',  # A lighter shade of blue
+        hovertemplate=(
+            "<b>%{y}</b><br>" +
+            "Upside to Mean: +%{x:.3f}<br>" +
+            "Total Mean Skill: %{customdata[0]:.3f}" +
+            "<extra></extra>"
+        ),
+        customdata=df[['u0_skill_mean']]
+    ))
+
+    # Update layout for stacked bars and better readability
+    fig.update_layout(
+        barmode='stack',
+        title="All-Time Driver Skill: Conservative vs. Mean Estimate",
+        xaxis_title="Driver Skill Score",
+        yaxis_title=None, # Remove y-axis title for a cleaner look
+        legend_title="Skill Metric",
+        legend=dict(yanchor="bottom", y=0.01, xanchor="left", x=0.99),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=10, r=10, t=50, b=20), # Adjust margins
+        height=400
+    )
+    
     return fig
 
 def plot_yearly_skill_comparison(df):
@@ -131,22 +226,6 @@ def plot_yearly_skill_comparison(df):
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
-def plot_driver_poe_comparison(df):
-    """Generates the Performance Over Expectation bar chart."""
-    df['wrapped_name'] = df['full_name'].apply(lambda x: "<br>".join(textwrap.wrap(x, width=10)))
-    fig = px.bar(df, 
-                 x='wrapped_name', 
-                 y='average_poe',
-                 color='full_name',
-                 title="Average Performance Over Expectation (POE)",
-                 labels={"average_poe": "Average POE (Higher is Better)", "wrapped_name": "Driver"},
-                 hover_data=['race_count'])
-    fig.add_hline(y=0, line_dash="dash", line_color="grey")
-    fig.update_layout(showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-    return fig
-
-
-# --- NEW: Function to render the Red Bull specific post ---
 def render_red_bull_post(_engine):
     """Loads data and creates all plots for the Red Bull post."""
     plots = {}
@@ -164,7 +243,7 @@ def render_red_bull_post(_engine):
     # POE Plot
     df_poe = get_poe_data(_engine)
     if not df_poe.empty:
-        plots['driver_poe_comparison'] = plot_driver_poe_comparison(df_poe)
+        plots['yearly_poe_trend'] = plot_yearly_poe_trend(df_poe)
         
     return plots
 
