@@ -9,11 +9,11 @@ Using data from our F1 performance model, let's analyze the drivers at the heart
 
 ### The Foundational Numbers: A Look at Career Skill
 
-Before diving into specific seasons, it's crucial to establish a baseline for each driver. The following chart displays our model's "Conservative Skill Estimate" (`u0_skill_lower_bound`) and "Mean Skill Estimate" (`u0_skill_mean`), which represents a driver's core talent level range, rewarding consistency over a career. Just a reminder: the average driver has an `u0_skill` of 0.0. I also included Verstappen as a reference.
+Before diving into specific seasons, it's crucial to establish a baseline for each driver. The following chart displays our model's "Conservative Skill Estimate" (`u0_skill_lower_bound`) and "Mean Skill Estimate" (`u0_skill_mean`), which represents a driver's core talent level range, free of age, experience car and any other modifiers - their genius. Just a reminder: the average driver has an `u0_skill` of 0.0. I also included Verstappen as a reference.
 
 <!-- PLOT:all_time_skill -->
 
-Pérez, a seasoned veteran, has a proven track record of being... well being a teensy bit above average driver with some glimpses of greatness. His heroics in 2021 Abu Dhabi will never be forgotten. Tsunoda on the other hand comes through as someone who barely scratches the requirements of being a Formula 1 driver. In fact the gap between Tsunoda and Perez is almost equal to the gap between Verstappen and Perez. We have low amount of data for Lawson and even more so for Hadjar, but based on what we have **BOTH** of them are more talented than Tsunoda. Hadjar's score reflects the model's cautious approach with rookies and his baseline will most likely increase for next year. Remember we're only talking about raw talent now, which does not always necessarily translate to better results due to other factors such as age, experience, yearly driver effects and most importantly - a bad car.
+Pérez, a seasoned veteran, has a proven track record of being... well being a bit above average driver with some glimpses of greatness. His heroics in 2021 Abu Dhabi will never be forgotten. Tsunoda on the other hand comes through as someone who barely scratches the requirements of being a Formula 1 driver. In fact the gap between Tsunoda and Perez is almost equal to the gap between Verstappen and Perez. We have low amount of data for Lawson and even more so for Hadjar, but based on what we have **BOTH** of them are more talented than Tsunoda. Hadjar's score reflects the model's cautious approach with rookies and his baseline will most likely increase for next year. Remember we're only talking about raw talent now, which does not always necessarily translate to better results due to other factors such as age, experience, yearly driver effects and most importantly - a bad car.
 
 ### Part A: Analyzing the Dismissal of Sergio Pérez
 
@@ -21,9 +21,9 @@ Sergio Pérez's 2024 season was a tale of inconsistency. While he secured 'some'
 
 <!-- PLOT:yearly_skill_comparison -->
 
-As you can see, Pérez's skill score through 2022-2024 is fairly consistent - a drivers skill doesn't just vanish overnight. Yes, there's a slight decline as he's aging, but nothing major, yet. Now if we look at Tsunoda's and Lawson's graphs we can agree with Red Bull's management on prefering the young kiwi. Lawson's skill level would likely match Perez's by the middle of 2025. Tsunoda would most likely needed at least one more year.  
+As you can see, Pérez's "Pure Skill Score" - his potential taking age and experience into consideration - through 2022-2024 is fairly consistent - a drivers skill doesn't just vanish overnight. Yes, there's a slight decline as he's aging, but nothing major, yet. Now if we look at Tsunoda's and Lawson's graphs we can agree with Red Bull's management on prefering the young kiwi. Lawson's skill level would likely match Perez's by the middle of 2025. Tsunoda's improvement seems much more sluggish and his ceiling is definitely lower.  
 
-If we look at the yearly "Performance Over Expectation" (POE) metric though, which measures how a driver performs against the model's race-by-race predictions, it's obvious that Perez **was** in a downward spiral.
+Now, if we look at the yearly "Performance Over Expectation" (POE) metric though, which measures how a driver performs against the model's race-by-race predictions, it's obvious that Perez **was** in a downward spiral.
 
 <!-- PLOT:yearly_poe_trend -->
 
