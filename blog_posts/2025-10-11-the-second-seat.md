@@ -21,7 +21,7 @@ Sergio Pérez's 2024 season was a tale of inconsistency. While he secured 'some'
 
 <!-- PLOT:yearly_skill_comparison -->
 
-As you can see, Pérez's skill score through 2022-2024 is fairly consistent - a drivers skill doesn't just vanish overnight. Yes, there's a slight decline as he's aging, but nothing major, yet. Now if we look at Tsunoda's and Lawson's graphs we can agree with Red Bull's management on prefering the young kiwi. Lawson's skill level would likely match Perez's by the middle of 2025. Tsunoda on the other hand would most likely needed at least one more year.  
+As you can see, Pérez's skill score through 2022-2024 is fairly consistent - a drivers skill doesn't just vanish overnight. Yes, there's a slight decline as he's aging, but nothing major, yet. Now if we look at Tsunoda's and Lawson's graphs we can agree with Red Bull's management on prefering the young kiwi. Lawson's skill level would likely match Perez's by the middle of 2025. Tsunoda would most likely needed at least one more year.  
 
 On the other hand though, if we look at the yearly "Performance Over Expectation" (POE) metric, which measures how a driver performs against the model's race-by-race predictions, it's obvious that Perez **was** in a downward spiral.
 
