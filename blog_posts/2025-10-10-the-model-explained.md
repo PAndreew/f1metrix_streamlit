@@ -7,7 +7,7 @@
 I fetched the training data from [f1db](https://github.com/f1db) - my appreciation for their hard work!
 5) It's a mathematical model, which means it's an approximation of reality and has some shortcomings. I'll try to improve it (for example by handling customer cars and DNFs) but it will never be perfect. It's just a crutch that helps understand this fascinating sport better.
 
-I try to make this blog a bit more user friendly and interactive than the standard blogging sites. Readers can explore the model's results and historical through charts and data tables.
+I try to make this blog a bit more user friendly and interactive than the standard blogging sites. Readers can explore the model's results and historical data through charts and data tables.
 
 **Now that’s settled let’s see how the model works!**
 
