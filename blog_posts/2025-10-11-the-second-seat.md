@@ -52,4 +52,4 @@ The data provides a nuanced view of Red Bull's turbulent driver strategy:
 -   **Pérez's dismissal was a logical, albeit difficult, decision** driven by a tangible drop in performance.
 -   **Lawson's swift replacement appears to be hasty**, a decision based on a sample size too small to be meaningful, especially given his potential.
 
-Meanwhile, with Isack Hadjar impressing in the Racing Bull, the pressure from the Red Bull pipeline remains as intense as ever.
+Meanwhile, with Isack Hadjar impressing in the Racing Bulls, the pressure from the Red Bull pipeline remains as intense as ever.
