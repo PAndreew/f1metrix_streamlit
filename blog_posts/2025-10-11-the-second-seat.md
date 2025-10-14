@@ -17,13 +17,13 @@ Pérez, a seasoned veteran, has a proven track record of being... well being a t
 
 ### Part A: Analyzing the Dismissal of Sergio Pérez
 
-Sergio Pérez's 2024 season was a tale of inconsistency. While he secured 'some' points for the team, the performance gap to his teammate was often stark. To determine if this was just a dip in form or a significant decline, we can track his "Yearly Pure Skill Score" over the past few seasons.
+Sergio Pérez's 2024 season was a tale of inconsistency. While he secured 'some' points for the team, the performance gap to his teammate was often stark, maybe embarassing even. To determine if this was just a dip in form or a significant decline, we can track his "Yearly Pure Skill Score" over the past few seasons.
 
 <!-- PLOT:yearly_skill_comparison -->
 
 As you can see, Pérez's skill score through 2022-2024 is fairly consistent - a driver inherent skill doesn't just vanish overnight. Yes, there's a slight decline as he's aging, but nothing major, yet. Now if we look at Tsunoda's and Lawson's graphs we can agree with Red Bull's management on prefering the young australian. Lawson's skill level would likely match Perez's by the middle of 2025. Tsunoda on the other hand would most likely needed at least one more year.  
 
-Also, if we look at the yearly "Performance Over Expectation" (POE) metric, which measures how a driver performs against the model's race-by-race predictions, it's obvious that Perez **was** in a downward spiral.
+On the other hand though, if we look at the yearly "Performance Over Expectation" (POE) metric, which measures how a driver performs against the model's race-by-race predictions, it's obvious that Perez **was** in a downward spiral.
 
 <!-- PLOT:yearly_poe_trend -->
 
@@ -32,10 +32,10 @@ Pérez's average POE dropped 0.4 standard deviation over 2 years, signifying a c
 **So to sum up** 
 
 Red Bull had 3 options:
-1) Keep their high(ish) ceiling, high experience and at the same time high paycheck and low confidence veteran
-2) Promote the low ceiling, so-so performing, so-so paycheck driver
+1) Keep the high(ish) ceiling, high experience but at the same time high paycheck and low confidence Perez
+2) Promote the low ceiling, so-so performing, so-so paycheck Tsunoda
 3) Promote the higher potential, low experience, OK
- performing rookie with the low paycheck
+ performing rookie Lawson with the low paycheck
 
 **Based on our data I think the conclusion is that Red Bull made the right decision to part ways with Pérez and to promote Lawson instead of Tsunoda.**
 
@@ -45,7 +45,7 @@ Yet, after just two races in the Red Bull, Lawson was replaced by... Yuki Tsunod
 
 This decision is far harder to justify with data. Two races is an insufficient sample size to judge any driver, especially one adapting to a new car and immense pressure. As our "All-Time Skill" chart showed, Lawson possesses a stronger underlying talent, definitely greater than Tsunoda.
 
-Sidelining him so quickly appears to be a reaction based on immediate, short-term results rather than a belief in the long-term data. It's possible that off-track factors or specific performance clauses were at play, but from a pure talent and potential perspective, **the decision to replace Lawson so hastily seems premature and questionable.** They could not realistically get much more from Tsunoda - and indeed they don't - instead they could compare Hadjar to a much more established reference and not to another rookie, who's performance might be much more volatile. I think after 17 races it is safe to say that from the 4 candidates Isack Hadjar is the most worthy.
+Sidelining him so quickly appears to be a reaction based on immediate, short-term results rather than a belief in the long-term data. It's possible that off-track factors or specific performance clauses were at play, but from a pure talent and potential perspective, **the decision to replace Lawson so hastily seems premature and questionable.** They could not realistically get much more from Tsunoda - and indeed they don't - instead they could compare Hadjar to a much more established reference and not to another rookie, who's performance might be much more volatile. I think after 17 races it is safe to say that from the 4 candidates Isack Hadjar is the worthiest.
 
 ### The Final Verdict
 
