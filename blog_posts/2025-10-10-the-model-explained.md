@@ -5,6 +5,7 @@
 3) Yes, I use Gemini 2.5 Pro to support me - it still took surprisingly long to get here, and it’s far from finished…
 4) The underlying model is a slightly modified amalgamation of [Dr. Andrew Bell et als. work](https://research-information.bris.ac.uk/ws/portalfiles/portal/70290855/F1_paper_Mar16.pdf) and Dr. Andrew Philips’ updated model.
 I fetched the training data from [f1db](https://github.com/f1db) - thank you for their hard work!
+5) It's a mathematical model, which means it's an approximation of reality and has some shortcomings. I'll try to improve it (for example by handling customer cars and DNFs) but it will have shortcomings. It's just a crutch that helps understand this fascinating sport better.
 
 I try to make this blog a bit more user friendly and interactive. Readers can explore the model's results and historical through charts and data tables.
 
