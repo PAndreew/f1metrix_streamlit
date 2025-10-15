@@ -37,8 +37,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Style the dropdown (selectbox) widget */
 .stSelectbox div[data-baseweb="select"] > div {
-    background-color: #2F4F4F; /* Dark Slate Gray */
-    color: #FFFFFF;
+    background-color: #eab1e8; /* Dark Slate Gray */
+    color: #000000;
 }
 
 /* Style the progress bar to keep it red */
