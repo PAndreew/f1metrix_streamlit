@@ -19,12 +19,14 @@ This post introduces our statistical model, designed to do exactly that. We will
 Think of any race result as a "pie" of success. Our model's job is to slice up that pie and assign a piece to every factor that contributed. It is a Bayesian hierarchical model built with PyMC, which in simple terms, means it learns a plausible range of values for each factor's contribution simultaneously.
 The main slices of the pie are:
 
-*Pure Driver Skill*: An innate, baseline talent that a driver carries throughout their career.
+*Pure Driver Talent*: An innate, baseline talent that a driver carries throughout their career.
 
 *Car Performance*: The specific strength or weakness of a team's car in a single season.
 
 *Team Strength*: The underlying, long-term engineering and operational quality of a constructor.
-*Contextual Factors*: The driver's age, their recent F1 experience, and crucially, their starting grid position for that race.
+
+*Contextual Factors*: The driver's age, their recent F1 experience, their capability for improvement and crucially, their starting grid position for that race.
+
 By accounting for every other slice, the model can isolate the piece of the pie that belongs to the driver.
 #### The "Ruler" of Performance: What the Model Measures
 The model does not predict finishing position directly. The performance gap between 1st and 2nd is massive, while the gap between 15th and 16th is negligible. To account for this, the model first converts race results onto a standardized statistical scale called `rankit_points`.
@@ -32,7 +34,7 @@ Think of this scale as a *performance scorecard* for every race. A score of 0.0 
 A score of +1.0 represents a great performance, one standard deviation above the average. This is a "Driver of the Day" level drive.
 A score of -1.0 represents a poor performance, one standard deviation below the average.
 This gives us a consistent "ruler" to measure every driver's performance in every race, regardless of the era or circumstances.
-#### The Key Metric: Pure Driver Skill (`u0`)
+#### The Key Metric: Pure Driver Talent (`u0`)
 The most important output of the model is the u0 parameter, which represents a driver's pure, innate skill. This is the "talent bonus" they bring to the table before any other factor is considered.
 When looking at our all-time rankings, you may notice that the top-ranked driver, Alain Prost, has a u0 score of around +0.3. This number seems small, which leads to a crucial point about the model's design: the model is deliberately skeptical and **gives credit to the car first**.
 Because drivers like Prost, Senna, and Schumacher drove some of the most dominant cars in history, the model attributes a huge portion of their success to the machinery. The u0 score represents the talent that remains after the massive advantage of the car has been accounted for. A score of +0.3 is not small; on the model's compressed scale, it is the largest talent signature it found among any driver in history.
