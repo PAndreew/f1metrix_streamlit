@@ -53,7 +53,9 @@ Over a 23-race season, this translates to an advantage of approximately ***115 c
 However, a driver's performance is not static. A simple, all-time ranking of innate talent (u0) is a good starting point, but it doesn't tell the whole story. Drivers evolve, improve, and eventually decline.
 Our model is designed to capture this career trajectory by incorporating a second crucial parameter: `u1`, which represents a driver's individual skill trend. This parameter captures a driver's personal rate of improvement or adaptation, separate from the typical age and experience curves the model also learns.
 This allows us to distinguish between two archetypes:
-The "Natural": A driver with a sky-high innate talent (u0) who enters the sport already near their peak. Their greatness lies in their consistency and incredibly high performance floor.
-The "Technician": A driver with immense talent who also shows a relentless, data-driven capacity for improvement (a high u1). Their greatness lies in their ability to sand off every rough edge of their craft, raising their own performance ceiling over time.
+
+The *"Natural"*: A driver with a sky-high innate talent (u0) who enters the sport already near their peak. Their greatness lies in their consistency and incredibly high performance floor.
+
+The *"Technician"*: A driver with immense talent who also shows a relentless, data-driven capacity for improvement (a high u1). Their greatness lies in their ability to sand off every rough edge of their craft, raising their own performance ceiling over time.
 This distinction resolves a potential contradiction: a driver like Prost might possess the highest innate talent, while a driver like Verstappen, through relentless refinement, could achieve a higher peak performance score during his prime. The model allows for both to be true.
 In our next posts, we will dive deeper into these year-by-year rankings, explore the greatest single-race performances in history, and see how these career arcs play out for the legends of the sport.
