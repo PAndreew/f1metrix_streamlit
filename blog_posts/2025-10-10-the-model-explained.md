@@ -11,7 +11,7 @@ I try to make this blog a bit more user friendly and interactive than the standa
 
 **Now that’s settled let’s see how the model works!**
 
-#### Quantifying Greatness**: How Our F1 Model Separates Driver Skill from Car Performance
+#### Quantifying Greatness: How Our F1 Model Separates Driver Skill from Car Performance
 The central, unresolved debate in Formula 1 has always been the same: how much of a driver's success is due to their personal talent, and how much is simply the car they drive? Could a legendary driver win in a midfield car? How much faster would an average driver be in a championship-winning machine?
 Simply looking at wins or points is insufficient. A 10th-place finish by Fernando Alonso in a 2001 Minardi was a monumental achievement, while a 2nd-place finish in a 2016 Mercedes was a relative disappointment. To have a meaningful discussion, we need a way to isolate the driver's contribution.
 This post introduces our statistical model, designed to do exactly that. We will explain how it works, what its outputs mean, and how to translate its statistical findings into tangible, on-track performance.
