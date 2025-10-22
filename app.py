@@ -271,7 +271,7 @@ def plot_latest_year_poe_interactive(df):
     race_number_map = {race_id: f"Race {i+1}" for i, race_id in enumerate(race_ids)}
     df['race_label'] = df['raceid'].map(race_number_map)
 
-    latest_year = 2024 
+    latest_year = 2025
     
     fig = px.line(
         df, 
