@@ -118,6 +118,32 @@ def get_poe_data(_engine):
         df['full_name'] = df['forename'] + ' ' + df['surname']
     return df
 
+
+@st.cache_data
+def get_latest_year_poe_data(_engine):
+    """
+    Fetches Performance Over Expectation data for all drivers for the most
+    recent year available in the database.
+    """
+    # This query finds the latest year and fetches all race data for that year
+    query = text("""
+        SELECT 
+            raceid,
+            forename, 
+            surname,
+            performance_over_expectation
+        FROM 
+            driver_performance_over_expectation 
+        WHERE 
+            year = (SELECT MAX(year) FROM driver_performance_over_expectation);
+    """)
+    with _engine.connect() as conn:
+        df = pd.read_sql(query, conn)
+    if not df.empty:
+        df['full_name'] = df['forename'] + ' ' + df['surname']
+    return df
+
+
 # 2. --- REBUILT Plotting Function ---
 # This function is now designed to create a line chart showing trends over time.
 def plot_yearly_poe_trend(df):
@@ -228,6 +254,59 @@ def plot_yearly_skill_comparison(df):
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
+def plot_latest_year_poe_interactive(df):
+    """
+    Generates a TALL, interactive line chart showing the race-by-race POE trend
+    for a user-selected list of drivers.
+    """
+    if df.empty:
+        return go.Figure()
+
+    # --- ORDERING FIX ---
+    # The dataframe is now pre-sorted by raceid before plotting.
+    df = df.sort_values('raceid')
+
+    # Create a cleaner 'Race 1', 'Race 2', etc. label for the x-axis
+    race_ids = df['raceid'].unique() # Already sorted
+    race_number_map = {race_id: f"Race {i+1}" for i, race_id in enumerate(race_ids)}
+    df['race_label'] = df['raceid'].map(race_number_map)
+
+    latest_year = 2024 
+    
+    fig = px.line(
+        df, 
+        x='race_label', 
+        y='performance_over_expectation',
+        color='full_name',
+        markers=True,
+        title=f"Race-by-Race Performance Over Expectation ({latest_year})",
+        labels={
+            "race_label": "Race of the Season",
+            "performance_over_expectation": "Performance Over Expectation (POE)",
+            "full_name": "Driver"
+        },
+        hover_data={"full_name": True, "performance_over_expectation": ':.3f'}
+    )
+
+    fig.add_hline(y=0, line_dash="dash", line_color="grey")
+
+    # --- TALLER & CLEANER LAYOUT FIX ---
+    fig.update_layout(
+        height=700,  # Makes the plot much taller
+        paper_bgcolor='rgba(0,0,0,0)', 
+        plot_bgcolor='rgba(0,0,0,0)',
+        legend_title_text='Selected Drivers', # Add a title to the legend
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.4, # Position legend further down to accommodate more names
+            xanchor="center",
+            x=0.5
+        )
+    )
+    
+    return fig
+
 def render_red_bull_post(_engine):
     """Loads data and creates all plots for the Red Bull post."""
     plots = {}
@@ -249,9 +328,63 @@ def render_red_bull_post(_engine):
         
     return plots
 
+
+def render_latest_poe_post(engine):
+    """
+    Loads data and creates an INTERACTIVE plot for the latest year's POE review,
+    allowing the user to select which drivers to display.
+    """
+    plots = {}
+    
+    # We still load ALL the data for the year initially
+    df_latest_poe = get_latest_year_poe_data(engine)
+    
+    if not df_latest_poe.empty:
+        # --- INTERACTIVITY WIDGET ---
+        st.markdown("##### 📈 Chart Controls")
+        st.info("The chart is interactive! Use the dropdown below to select the drivers you want to compare.")
+
+        # Get a list of all drivers from the data, sorted alphabetically
+        all_drivers = sorted(df_latest_poe['full_name'].unique())
+
+        # Set a sensible default list of drivers to show initially
+        default_drivers = [
+            'Max Verstappen', 'Lando Norris', 'Charles Leclerc', 
+            'Oscar Piastri', 'Alexander Albon'
+        ]
+        # Ensure defaults are actually in the data to prevent errors
+        default_drivers = [d for d in default_drivers if d in all_drivers]
+
+        # The multi-select widget
+        selected_drivers = st.multiselect(
+            "Select drivers to display on the chart:",
+            options=all_drivers,
+            default=default_drivers
+        )
+        
+        # --- Filter the DataFrame based on user selection ---
+        if selected_drivers:
+            filtered_df = df_latest_poe[df_latest_poe['full_name'].isin(selected_drivers)]
+            
+            # Generate the plot using ONLY the filtered data
+            plots['latest_year_poe_plot'] = plot_latest_year_poe_interactive(filtered_df)
+        else:
+            # If no drivers are selected, create an empty plot
+            st.warning("Please select at least one driver to display the chart.")
+            plots['latest_year_poe_plot'] = go.Figure().update_layout(
+                height=700,
+                paper_bgcolor='rgba(0,0,0,0)', 
+                plot_bgcolor='rgba(0,0,0,0)'
+            )
+            
+    return plots
+
+
+
 # --- NEW: Dictionary mapping posts to their renderer functions ---
 POST_RENDERERS = {
-    "2025-10-11-the-second-seat.md": render_red_bull_post
+    "2025-10-11-the-second-seat.md": render_red_bull_post,
+    "2025-10-22-performance-ranking-after-us-grand-prix.md": render_latest_poe_post
 }
 
 # --- NEW: Generic function to render markdown with plot placeholders ---
