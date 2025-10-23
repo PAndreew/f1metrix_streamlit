@@ -254,6 +254,57 @@ def plot_yearly_skill_comparison(df):
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
+def plot_latest_year_poe(df):
+    """
+    Generates a line chart showing the race-by-race trend of Performance Over
+    Expectation for all drivers in the last season of data.
+    """
+    if df.empty:
+        return go.Figure()
+
+    # To make the X-axis cleaner, we'll create a simple 'Race Number'
+    # First, get the unique, sorted race IDs
+    race_ids = sorted(df['raceid'].unique())
+    # Create a mapping from the actual raceid to a simple number (1, 2, 3...)
+    race_number_map = {race_id: f"Race {i+1}" for i, race_id in enumerate(race_ids)}
+    df['race_label'] = df['raceid'].map(race_number_map)
+
+    # You can get the year dynamically if the 'year' column is available
+    # For now, we'll assume the latest year, e.g., 2024
+    latest_year = 2024 
+    
+    fig = px.line(df, 
+                  x='race_label', 
+                  y='performance_over_expectation',
+                  color='full_name',  # This creates a separate line for each driver
+                  markers=True,       # Puts a dot on each data point (each race)
+                  title=f"Race-by-Race Performance Over Expectation ({latest_year})",
+                  labels={
+                      "race_label": "Race of the Season",
+                      "performance_over_expectation": "Performance Over Expectation (POE)",
+                      "full_name": "Driver"
+                  },
+                  hover_data={"full_name": True, "performance_over_expectation": ':.3f'}) # Custom hover info
+
+    # Add the crucial baseline at y=0
+    fig.add_hline(y=0, line_dash="dash", line_color="grey", 
+                  annotation_text="Expectation Baseline", annotation_position="bottom right")
+
+    # Standard styling and improved legend placement
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)', 
+        plot_bgcolor='rgba(0,0,0,0)',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3, # Adjust this value to move the legend up or down
+            xanchor="center",
+            x=0.5
+        )
+    )
+    
+    return fig
+
 def plot_latest_year_poe_interactive(df):
     """
     Generates a TALL, interactive line chart showing the race-by-race POE trend
@@ -307,6 +358,93 @@ def plot_latest_year_poe_interactive(df):
     
     return fig
 
+def create_last_race_ranking_table(df):
+    """
+    Filters the POE data for the very last race and returns a ranked DataFrame.
+    """
+    if df.empty:
+        return pd.DataFrame()
+
+    # Find the ID of the last race in the dataset
+    last_race_id = df['raceid'].max()
+    
+    # Filter the DataFrame to include only data from that last race
+    last_race_df = df[df['raceid'] == last_race_id].copy()
+    
+    # Sort by performance, from best to worst
+    last_race_df = last_race_df.sort_values('performance_over_expectation', ascending=False)
+    
+    # Add a 'Rank' column
+    last_race_df['Rank'] = range(1, len(last_race_df) + 1)
+    
+    # Select, reorder, and rename columns for a clean presentation
+    final_table = last_race_df[['Rank', 'full_name', 'performance_over_expectation']]
+    final_table = final_table.rename(columns={
+        'full_name': 'Driver',
+        'performance_over_expectation': 'Performance Score (POE)'
+    })
+    
+    return final_table
+
+def render_sql_query_tab(engine):
+    """
+    Creates a tab in the UI for users to run their own SQL queries securely.
+    """
+    st.header("Direct SQL Query Tool")
+    st.info("Query the model results database directly. For security, only **read-only SELECT** statements are allowed.", icon="🔍")
+
+    # --- Schema Helper ---
+    with st.expander("View Database Schema and Available Tables"):
+        st.markdown("""
+        You can query the following tables. Click on a table name to see its columns.
+        """)
+        try:
+            from sqlalchemy import inspect
+            inspector = inspect(engine)
+            table_names = inspector.get_table_names()
+            
+            for table in table_names:
+                with st.expander(f"Table: `{table}`"):
+                    columns = inspector.get_columns(table)
+                    col_data = [{"Column Name": col['name'], "Data Type": str(col['type'])} for col in columns]
+                    st.table(col_data)
+
+        except Exception as e:
+            st.warning(f"Could not retrieve database schema. Error: {e}")
+    
+    # --- Query Input Area ---
+    default_query = """-- Find the top 10 single-race overperformances since 2022
+SELECT 
+    forename, 
+    surname, 
+    year,
+    performance_over_expectation
+FROM driver_performance_over_expectation
+WHERE year >= 2022
+ORDER BY performance_over_expectation DESC
+LIMIT 10;"""
+    
+    query = st.text_area("Enter your SQL Query:", value=default_query, height=250, key="sql_query_area")
+    
+    if st.button("Run Query", type="primary"):
+        # --- SECURITY CHECK ---
+        # Trim whitespace and check if it's a read-only query
+        cleaned_query = query.strip()
+        if not cleaned_query.lower().startswith('select'):
+            st.error("⚠️ Security Error: Only SELECT statements are permitted.", icon="🚫")
+        else:
+            # --- EXECUTE QUERY ---
+            try:
+                with engine.connect() as conn:
+                    result_df = pd.read_sql(text(cleaned_query), conn)
+                
+                st.success(f"Query executed successfully! Found **{len(result_df)}** rows.", icon="✅")
+                st.dataframe(result_df, use_container_width=True)
+                
+            except Exception as e:
+                # Display database or syntax errors to the user
+                st.error(f"An error occurred while executing the query: {e}", icon="❌")
+
 def render_red_bull_post(_engine):
     """Loads data and creates all plots for the Red Bull post."""
     plots = {}
@@ -329,6 +467,29 @@ def render_red_bull_post(_engine):
     return plots
 
 
+def render_poe_explanation_text():
+    """
+    Creates a reusable Streamlit expander to explain how to interpret the
+    Performance Over Expectation (POE) scores.
+    """
+    with st.expander("❓ How to Interpret These Scores"):
+        st.markdown("""
+        The 'Performance Score (POE)' measures how much better (or worse) a driver performed compared to their personalized prediction for that race.
+
+        **1. The Scale is Common:** A score of **+0.5** is always a bigger over-performance than **+0.3**. The numbers are directly comparable.
+
+        **2. The Difficulty is Not:** A driver's prediction is based on their skill, car, grid position, etc. It's much harder for a top driver with a high prediction to over-perform.
+
+        ---
+        #### An Analogy: The University Exam
+
+        *   **Max Verstappen (The A+ Student):** The model expects him to get a 98% on the exam. If he gets a 100%, his POE is a **small +2**. Over-performing against excellence is hard.
+
+        *   **A Midfield Driver (The C+ Student):** The model expects them to get a 75%. If they have a great day and score an 85%, their POE is a **large +10**.
+
+        **Conclusion:** The C+ student had the bigger *surprise* (a higher POE score), but the A+ student still achieved the better absolute result. When looking at the table, a high POE score means that driver had a surprisingly great day.
+        """)
+
 def render_latest_poe_post(engine):
     """
     Loads data and creates an INTERACTIVE plot for the latest year's POE review,
@@ -349,8 +510,8 @@ def render_latest_poe_post(engine):
 
         # Set a sensible default list of drivers to show initially
         default_drivers = [
-            'Max Verstappen', 'Lando Norris', 'Charles Leclerc', 
-            'Oscar Piastri', 'Alexander Albon'
+            'Max Verstappen', 'Lando Norris', 'George Russell', 
+            'Oscar Piastri'
         ]
         # Ensure defaults are actually in the data to prevent errors
         default_drivers = [d for d in default_drivers if d in all_drivers]
@@ -371,12 +532,16 @@ def render_latest_poe_post(engine):
         else:
             # If no drivers are selected, create an empty plot
             st.warning("Please select at least one driver to display the chart.")
+            render_poe_explanation_text()
+
             plots['latest_year_poe_plot'] = go.Figure().update_layout(
                 height=700,
                 paper_bgcolor='rgba(0,0,0,0)', 
                 plot_bgcolor='rgba(0,0,0,0)'
             )
-            
+        
+        plots['last_race_table'] = create_last_race_ranking_table(df_latest_poe)
+    
     return plots
 
 
@@ -401,7 +566,11 @@ def render_markdown_with_plots(content, plots):
         if i < len(placeholders):
             plot_name = placeholders[i]
             if plot_name in plots:
-                st.plotly_chart(plots[plot_name], use_container_width=True)
+                element = plots[plot_name]
+                if isinstance(element, go.Figure):
+                    st.plotly_chart(element, use_container_width=True)
+                elif isinstance(element, pd.DataFrame):
+                    st.dataframe(element, use_container_width=True)
             else:
                 st.warning(f"Warning: Plot '{plot_name}' not found.")
 
@@ -440,7 +609,8 @@ def read_markdown_file(markdown_file):
 st.title("F1 Metrix")
 st.header("A Formula 1 Data Analytics Blog")
 
-blog_tab, dataviz_tab = st.tabs(["📝 Blog Posts", "📊 Data Visualizations"])
+blog_tab, dataviz_tab, sql_tab = st.tabs(["📝 Blog Posts", "📊 Data Visualizations", "🔍 SQL Query Tool"])
+
 
 # --- Blog Tab ---
 with blog_tab:
@@ -524,3 +694,7 @@ with dataviz_tab:
         df_summary = load_data("model_summary")
         if not df_summary.empty:
             st.dataframe(df_summary, height=500)
+
+with sql_tab:
+    # This calls the new function you just added
+    render_sql_query_tab(engine)

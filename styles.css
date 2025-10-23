@@ -51,3 +51,22 @@ div.row-widget.stRadio > div {
     flex-direction: row;
     align-items: stretch;
 }
+
+.stTextArea textarea {
+    background-color: #262730; /* A dark, modern grey */
+    color: #FAFAFA;           /* A slightly off-white for better readability */
+    border: 1px solid #4A4A4A; /* A subtle border */
+    border-radius: 0.5rem;     /* Matches Streamlit's default rounding */
+    -webkit-text-fill-color: #FAFAFA; /* Ensures text color on WebKit browsers */
+}
+
+/* Style the text area when it is focused (clicked on) */
+.stTextArea textarea:focus {
+    border-color: #1E90FF;  /* Use your app's primary blue for the focus highlight */
+    box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.5); /* Adds a soft blue glow */
+}
+
+/* Style the placeholder text to be less prominent */
+.stTextArea textarea::placeholder {
+    color: #888;
+}
