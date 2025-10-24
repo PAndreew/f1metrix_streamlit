@@ -39,7 +39,7 @@ Red Bull had 3 options by the end of 2024:
 
 **Based on our data I think the conclusion is that Red Bull made the right decision to part ways with Pérez and to promote Lawson instead of Tsunoda.**
 
-Part B: The Two-Race Gamble on Liam Lawson
+### Part B: The Two-Race Gamble on Liam Lawson
 Yet, after just two races in the Red Bull, Lawson was replaced by... Yuki Tsunoda?!
 This decision is far harder to justify with data. Two races is an insufficient sample size to judge any driver, especially one adapting to a new car and immense pressure. As our "All-Time Skill" chart showed, Lawson possesses a stronger underlying talent, definitely greater than Tsunoda.
 Sidelining him so quickly appears to be a reaction based on immediate, short-term results rather than a belief in the long-term data. It's possible that off-track factors or specific performance clauses were at play, but from a pure talent and potential perspective, the decision to replace Lawson so hastily seems premature and questionable.
