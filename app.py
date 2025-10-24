@@ -502,43 +502,43 @@ def render_latest_poe_post(engine):
     
     if not df_latest_poe.empty:
         # --- INTERACTIVITY WIDGET ---
-        st.markdown("##### 📈 Chart Controls")
-        st.info("The chart is interactive! Use the dropdown below to select the drivers you want to compare.")
+        # st.markdown("##### 📈 Chart Controls")
+        # st.info("The chart is interactive! Use the dropdown below to select the drivers you want to compare.")
 
         # Get a list of all drivers from the data, sorted alphabetically
-        all_drivers = sorted(df_latest_poe['full_name'].unique())
+        # all_drivers = sorted(df_latest_poe['full_name'].unique())
 
         # Set a sensible default list of drivers to show initially
-        default_drivers = [
-            'Max Verstappen', 'Lando Norris', 'George Russell', 
-            'Oscar Piastri'
-        ]
-        # Ensure defaults are actually in the data to prevent errors
-        default_drivers = [d for d in default_drivers if d in all_drivers]
+        # default_drivers = [
+        #     'Max Verstappen', 'Lando Norris', 'George Russell', 
+        #     'Oscar Piastri'
+        # ]
+        # # Ensure defaults are actually in the data to prevent errors
+        # default_drivers = [d for d in default_drivers if d in all_drivers]
 
-        # The multi-select widget
-        selected_drivers = st.multiselect(
-            "Select drivers to display on the chart:",
-            options=all_drivers,
-            default=default_drivers
-        )
+        # # The multi-select widget
+        # selected_drivers = st.multiselect(
+        #     "Select drivers to display on the chart:",
+        #     options=all_drivers,
+        #     default=default_drivers
+        # )
         
-        # --- Filter the DataFrame based on user selection ---
-        if selected_drivers:
-            filtered_df = df_latest_poe[df_latest_poe['full_name'].isin(selected_drivers)]
+        # # --- Filter the DataFrame based on user selection ---
+        # if selected_drivers:
+        #     filtered_df = df_latest_poe[df_latest_poe['full_name'].isin(selected_drivers)]
             
-            # Generate the plot using ONLY the filtered data
-            plots['latest_year_poe_plot'] = plot_latest_year_poe_interactive(filtered_df)
-        else:
-            # If no drivers are selected, create an empty plot
-            st.warning("Please select at least one driver to display the chart.")
-            render_poe_explanation_text()
+        #     # Generate the plot using ONLY the filtered data
+        #     plots['latest_year_poe_plot'] = plot_latest_year_poe_interactive(filtered_df)
+        # else:
+        #     # If no drivers are selected, create an empty plot
+        #     st.warning("Please select at least one driver to display the chart.")
+        #     render_poe_explanation_text()
 
-            plots['latest_year_poe_plot'] = go.Figure().update_layout(
-                height=700,
-                paper_bgcolor='rgba(0,0,0,0)', 
-                plot_bgcolor='rgba(0,0,0,0)'
-            )
+        #     plots['latest_year_poe_plot'] = go.Figure().update_layout(
+        #         height=700,
+        #         paper_bgcolor='rgba(0,0,0,0)', 
+        #         plot_bgcolor='rgba(0,0,0,0)'
+        #     )
         
         plots['last_race_table'] = create_last_race_ranking_table(df_latest_poe)
     
