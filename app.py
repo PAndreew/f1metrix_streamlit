@@ -413,8 +413,7 @@ def render_sql_query_tab(engine):
             st.warning(f"Could not retrieve database schema. Error: {e}")
     
     # --- Query Input Area ---
-    default_query = """-- Find the top 10 single-race overperformances since 2022
-SELECT 
+    default_query = """SELECT 
     forename, 
     surname, 
     year,
