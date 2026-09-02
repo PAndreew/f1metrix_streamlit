@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{.Title}} · F1 Metrix</title><meta name="description" content="Bayesian Formula One driver and constructor rankings.">
+<link rel="stylesheet" href="/static/styles.css"><script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script><script defer src="/static/app.js"></script></head>
+<body><header><a class="brand" href="/">F1<span>METRIX</span></a><nav><a href="/drivers">Drivers</a><a href="/teams">Teams</a><a href="/races">Races</a><a href="/posts">Analysis</a><a href="/methodology">Model</a></nav></header><main>
+{{if eq .Kind "home"}}
+<section class="hero"><p class="eyebrow">Updated through {{.Metadata.LastRaceDate}}</p><h1>Separate the driver<br>from the machine.</h1><p>Bayesian rankings of Formula One drivers and constructors, with uncertainty kept visible.</p></section>
+<div class="notice"><b>{{.Metadata.LastRace}}</b><span>{{.Metadata.Model}} · {{.Metadata.Observations}} modeled starts</span></div>
+<div class="grid two"><section><div class="section-head"><h2>{{.LatestYear}} drivers</h2><a href="/drivers">All drivers →</a></div>{{template "driver-table" .}}</section><section><div class="section-head"><h2>{{.LatestYear}} cars</h2><a href="/teams">All teams →</a></div>{{template "team-table" .}}</section></div>
+<section><div class="section-head"><h2>Latest analysis</h2><a href="/posts">All posts →</a></div><div class="posts">{{range .Posts}}<a href="/posts/{{.Slug}}"><time>{{.Date}}</time><b>{{.Title}}</b></a>{{end}}</div></section>
+{{else if eq .Kind "drivers"}}
+<h1>Driver rankings</h1><p class="lede">Conservative rank orders the 3% posterior bound, rewarding both estimated skill and evidence.</p>
+<form class="filters"><label>Search<input name="q" value="{{.Query}}"></label><label>From<input type="number" name="from" value="{{.From}}"></label><label>To<input type="number" name="to" value="{{.To}}"></label><label>Minimum races<input type="number" name="min_races" value="{{.MinRaces}}"></label><label>Order<select name="sort"><option value="conservative" {{if eq .Sort "conservative"}}selected{{end}}>Conservative</option><option value="mean" {{if eq .Sort "mean"}}selected{{end}}>Posterior mean</option><option value="races" {{if eq .Sort "races"}}selected{{end}}>Race count</option></select></label><button>Apply</button></form>
+{{template "driver-table" .}}
+{{else if eq .Kind "driver"}}
+<a class="back" href="/drivers">← Driver rankings</a><div class="driver-head"><div><p class="eyebrow">Rank #{{.Driver.Rank}} · {{.Driver.FirstYear}}–{{.Driver.LastYear}}</p><h1>{{.Driver.Name}}</h1><p>{{.Driver.Races}} races in the model</p></div><div class="big-score"><b>{{printf "%.3f" .Driver.Skill}}</b><span>baseline skill</span></div></div>
+<section class="chart-card"><h2>Career curve</h2><p>Posterior median and 94% interval, adjusted for the shared age and recent-experience curve.</p><canvas class="career-chart" data-driver="{{.Driver.ID}}"></canvas></section>
+{{else if eq .Kind "teams"}}
+<h1>Team rankings</h1><p class="lede">Constructor plus constructor-season effect. Scores are comparable within the model, not championship points.</p><form class="filters compact"><label>Season<input name="year" type="number" min="1950" value="{{.LatestYear}}"></label><button>Show</button></form>{{template "team-table" .}}
+{{else if eq .Kind "races"}}
+<h1>Recent races</h1><p class="lede">Results included in the model. Mechanical and ambiguous retirements are excluded from pace estimation.</p><div class="race-list">{{range .Races}}<details><summary><span>{{.Date}}</span><b>{{.Name}}</b></summary><table><thead><tr><th>Finish</th><th>Driver</th><th>Performance over expectation</th></tr></thead><tbody>{{range .Results}}<tr><td>{{.Position}}</td><td><a href="/drivers/{{.DriverID}}">{{.DriverID}}</a></td><td>{{score .POE}}</td></tr>{{end}}</tbody></table></details>{{end}}</div>
+{{else if eq .Kind "posts"}}
+<h1>Analysis</h1><div class="posts large">{{range .Posts}}<a href="/posts/{{.Slug}}"><time>{{.Date}}</time><b>{{.Title}}</b></a>{{end}}</div>
+{{else if eq .Kind "post"}}
+<article><a class="back" href="/posts">← Analysis</a><time>{{.Post.Date}}</time>{{.Post.HTML}}</article>
+{{else if eq .Kind "methodology"}}
+<article><h1>The model</h1><p class="lede">A robust cross-classified Bayesian model inspired by Bell et al. (2016) and Andrew Phillips' f1metrics.</p><h2>Outcome</h2><p>Each finishing order is transformed to expected Normal order statistics (“rankits”), making results comparable across field sizes. Indianapolis 500 championship rounds are omitted. Mechanical and ambiguous retirements are excluded; accidents and collisions remain driver outcomes.</p><h2>Structure</h2><pre>rankit ~ StudentT(ν, μ, σ)
+μ = driver + constructor + constructor-season
+    + shared age curve + recent experience</pre><p>Driver, constructor and constructor-season effects are partially pooled. Recent experience counts active seasons among the previous four. The constrained age curve peaks between ages 22 and 38. A Student-t likelihood limits the influence of freak results.</p><h2>What changed</h2><ul><li>Removed starting grid as a predictor: grid is a mediator of driver and car performance, not a pre-race confounder.</li><li>Replaced the fragile Gaussian likelihood with Student-t residuals.</li><li>Excluded technical DNFs instead of treating a broken car as driver pace.</li><li>Constrained age and experience effects to reduce confounding.</li><li>Publish 94% intervals and conservative ranks, plus convergence diagnostics.</li></ul><h2>Known limitations</h2><p>Retirement labels are imperfect. Constructor IDs identify chassis and can conflate customer and works entrants before 1981. Strategy, weather and circuit effects are not yet modeled. Rankings are conditional estimates, not facts.</p><h2>Sources</h2><p><a href="https://doi.org/10.1515/jqas-2015-0050">Bell, Smith, Sabel &amp; Jones (2016)</a> · <a href="https://f1metrics.wordpress.com/2019/09/10/a-new-f1metrics-model/">Phillips (2019)</a> · <a href="https://github.com/f1db/f1db">F1DB</a></p><h2>Current run</h2><pre>{{.Metadata.Model}}
+Source: {{.Metadata.SourceRelease}}
+Generated: {{.Metadata.GeneratedAt}}
+Diagnostics: {{printf "%v" .Metadata.Diagnostics}}</pre></article>
+{{end}}
+</main><footer><span>F1 Metrix · open estimates, visible uncertainty</span><a href="/methodology">Method &amp; sources</a></footer></body></html>
+
+{{define "driver-table"}}<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Driver</th><th>Estimate</th><th>94% interval</th><th>Races</th></tr></thead><tbody>{{range .Drivers}}<tr><td class="rank">{{.Rank}}</td><td><a href="/drivers/{{.ID}}"><b>{{.Name}}</b></a><small>{{.FirstYear}}–{{.LastYear}}</small></td><td>{{printf "%+.3f" .Skill}}</td><td><span class="interval"><i style="--low:{{printf "%.1f" .Low}};--high:{{printf "%.1f" .High}}"></i>{{printf "%.3f — %.3f" .Low .High}}</span></td><td>{{.Races}}</td></tr>{{end}}</tbody></table></div>{{end}}
+{{define "team-table"}}<div class="table-wrap"><table><thead><tr><th>Rank</th><th>Constructor</th><th>Model score</th><th>94% interval</th></tr></thead><tbody>{{range .Teams}}<tr><td class="rank">{{.Rank}}</td><td><b>{{.Name}}</b></td><td>{{printf "%+.3f" .Score}}</td><td>{{printf "%.3f — %.3f" .Low .High}}</td></tr>{{end}}</tbody></table></div>{{end}}

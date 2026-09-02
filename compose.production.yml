@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    container_name: f1metrix-web
+    restart: unless-stopped
+    environment:
+      F1METRIX_ADDR: ":8080"
+      F1METRIX_DATA: "/data/model-output.json"
+      F1METRIX_BOOTSTRAP: "/app/bootstrap.json"
+    volumes:
+      - model_data:/data:ro
+    expose:
+      - "8080"
+    networks:
+      - caddy_edge
+
+  model:
+    profiles: ["model"]
+    build:
+      context: .
+      dockerfile: model.Dockerfile
+    environment:
+      F1METRIX_METHOD: "advi"
+    volumes:
+      - model_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+
+networks:
+  caddy_edge:
+    external: true
+    name: bleeek_backend
+
+volumes:
+  model_data:
