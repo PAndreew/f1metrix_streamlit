@@ -163,7 +163,7 @@ def export_snapshot(data: ModelData, idata, source_db: Path, output: Path, relea
         import arviz as az
         if idata.posterior.sizes.get("chain", 1) < 2:
             raise ValueError("fewer than two chains")
-        summary = az.summary(idata, var_names=["sigma_driver", "sigma_constructor", "sigma_constructor_year", "sigma", "age_peak", "age_decline"])
+        summary = az.summary(idata, var_names=["intercept", "driver_skill", "constructor_skill", "constructor_year_skill", "sigma_driver", "sigma_constructor", "sigma_constructor_year", "sigma", "age_peak", "age_decline", "experience_steps", "nu_minus_two"])
         diagnostics = {"maxRhat": round(float(summary.r_hat.max()), 4), "minEssBulk": round(float(summary.ess_bulk.min()), 1)}
         if "sample_stats" in idata and "diverging" in idata.sample_stats:
             diagnostics["divergences"] = int(idata.sample_stats.diverging.sum())
@@ -193,11 +193,14 @@ def main() -> None:
     parser.add_argument("--tune", type=int, default=1200)
     parser.add_argument("--advi-iterations", type=int, default=60000)
     parser.add_argument("--through-year", type=int)
+    parser.add_argument("--before-date", help="Strict exclusive cutoff for held-out fits (YYYY-MM-DD)")
+    parser.add_argument("--forecast-race", type=int)
+    parser.add_argument("--forecast-output", type=Path)
     args = parser.parse_args()
 
     import arviz as az
     import pymc as pm
-    data = load_model_data(args.database, args.through_year)
+    data = load_model_data(args.database, args.through_year, args.before_date)
     model = build_model(data)
     with model:
         if args.method == "nuts":
@@ -210,6 +213,11 @@ def main() -> None:
     args.artifact.parent.mkdir(parents=True, exist_ok=True)
     az.to_netcdf(idata, args.artifact)
     export_snapshot(data, idata, args.database, args.output, args.release)
+    if args.forecast_race:
+        if not args.before_date or not args.forecast_output:
+            parser.error("forecast requires --before-date and --forecast-output")
+        from forecast import simulate
+        simulate(data, idata, args.database, args.forecast_race, args.before_date, args.forecast_output)
 
 
 if __name__ == "__main__":

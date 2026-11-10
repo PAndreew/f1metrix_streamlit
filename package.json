@@ -2,10 +2,19 @@
   "private": true,
   "scripts": {
     "build": "esbuild web/static/app.ts --bundle --minify --target=es2020 --outfile=web/static/app.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:site": "python3 scripts/export_publication.py && vite site --host 0.0.0.0",
+    "build:site": "python3 scripts/export_publication.py && vite build site",
+    "preview:site": "vite preview site --host 0.0.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "sql.js": "^1.13.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
-    "typescript": "^5.7.0"
+    "playwright": "^1.65.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.3.5"
   }
 }

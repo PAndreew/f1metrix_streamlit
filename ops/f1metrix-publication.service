@@ -1,0 +1,26 @@
+[Unit]
+Description=Isolated F1 Metrix batch publication worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=f1metrix
+Group=f1metrix
+WorkingDirectory=/opt/f1metrix-publication
+EnvironmentFile=/etc/f1metrix-publication.env
+Environment=OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+Environment=PYTENSOR_FLAGS=base_compiledir=/tmp/f1metrix-pytensor XDG_CACHE_HOME=/tmp/f1metrix-cache
+ExecStart=/opt/f1metrix-publication/.venv/bin/python -m pipeline.run
+TimeoutStartSec=5h
+CPUQuota=100%
+MemoryMax=1536M
+MemorySwapMax=0
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/f1metrix-publication/.pipeline /opt/f1metrix-publication/publication
+UMask=0077

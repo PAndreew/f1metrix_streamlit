@@ -1,6 +1,23 @@
 # F1 Metrix
 
-Interactive Bayesian Formula One rankings. A small Go server renders filters, tables, articles and Chart.js visualizations; a separate PyMC batch job downloads F1DB and atomically publishes a JSON snapshot.
+An open-source Formula One analytics journal: historical PyMC estimates, held-out race simulations, evidence-grounded AI writing, and a responsive, static Vercel frontend.
+
+## New publication frontend and pipeline
+
+```sh
+npm ci --include=dev
+npm run dev:site
+npm run build:site
+python -m pipeline.run --check
+```
+
+Import this repository into Vercel; `vercel.json` configures the static build. The site has Chart.js uncertainty charts, searchable/filterable/sortable browser-local SQLite tables, CSV export, article views and a methodology page. Until a validated release exists, it clearly labels its bundled historical data as an unreliable legacy preview.
+
+A six-hour GitHub Actions watcher checks F1DB releases. On change it verifies and downloads SQLite, runs full NUTS fits, reconstructs held-out joint race outcomes, fetches structured OpenF1 evidence, requests a source-linked article, validates the output and commits the completed publication. The previous publication remains live on failure.
+
+**Activation requires** repository secret `OPENROUTER_API_KEY` and Actions variable `F1METRIX_LLM_MODEL`. No LLM credential or Vercel project is preconfigured. Full sampling is deliberately not run on the Raspberry Pi. See **[publication operations, limits and deployment](docs/PUBLICATION.md)** before enabling heavy jobs. Passing sampler checks does not replace predictive calibration, and this first release does not transcribe radio or scrape journalism.
+
+The original lightweight Go site and its deployment remain intact below.
 
 ## Architecture
 

@@ -17,3 +17,9 @@ data/f1db-release.json
 model/artifacts/
 web/static/app.js
 .env
+.pipeline/
+site/dist/
+site/public/data/
+site/public/sql-wasm.wasm
+*.nc
+.vercel/

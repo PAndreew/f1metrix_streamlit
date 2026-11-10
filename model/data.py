@@ -39,10 +39,13 @@ def recent_experience(years: pd.Series) -> pd.Series:
     return pd.Series(values, index=years.index, dtype="int64")
 
 
-def load_model_data(database: str | Path, through_year: int | None = None) -> ModelData:
+def load_model_data(database: str | Path, through_year: int | None = None, before_date: str | None = None) -> ModelData:
     conn = sqlite3.connect(f"file:{Path(database).resolve()}?mode=ro", uri=True)
     where_year = "AND r.year <= ?" if through_year else ""
     params = (through_year,) if through_year else ()
+    if before_date:
+        where_year += " AND r.date < ?"
+        params += (before_date,)
     results = pd.read_sql_query(
         f"""
         SELECT rr.race_id, r.year, r.round, r.date, r.official_name,
@@ -93,6 +96,8 @@ def load_model_data(database: str | Path, through_year: int | None = None) -> Mo
     results = results.merge(seasons.reset_index(), on=["driver_id", "year"], how="left")
 
     observations = results.loc[results["included"]].copy().reset_index(drop=True)
+    if observations.empty:
+        raise ValueError("No usable race observations before the requested cutoff")
     driver_ids = sorted(observations["driver_id"].unique())
     constructor_ids = sorted(observations["constructor_id"].unique())
     observations["constructor_year_id"] = observations["constructor_id"] + ":" + observations["year"].astype(str)
