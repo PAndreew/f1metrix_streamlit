@@ -77,6 +77,20 @@ def test_joint_simulation_has_exactly_one_of_each_position():
     assert np.all(ranks.sum(axis=1) == 253)
 
 
+def test_lap_snapshots_use_only_updates_known_at_lap_start():
+    from pipeline.evidence import lap_snapshots
+    laps = [{'lap_number': 1, 'date_start': '2026-01-01T12:00:00+00:00'},
+            {'lap_number': 2, 'date_start': '2026-01-01T12:01:40+00:00'}]
+    positions = [{'driver_number': 1, 'position': 1, 'date': '2026-01-01T11:59:59+00:00'},
+                 {'driver_number': 2, 'position': 2, 'date': '2026-01-01T11:59:59+00:00'},
+                 {'driver_number': 2, 'position': 1, 'date': '2026-01-01T12:01:00+00:00'},
+                 {'driver_number': 1, 'position': 2, 'date': '2026-01-01T12:01:00+00:00'},
+                 {'driver_number': 1, 'position': 1, 'date': '2026-01-01T12:02:00+00:00'}]
+    result = lap_snapshots(laps, positions, {1:'A',2:'B'})
+    assert result[0]['reportedTopTen'][0]['name'] == 'A'
+    assert result[1]['reportedTopTen'][0]['name'] == 'B'
+
+
 def test_atomic_json_rejects_nan(tmp_path):
     with pytest.raises(ValueError):
         atomic_json(tmp_path / 'bad.json', {'x': float('nan')})

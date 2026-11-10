@@ -12,6 +12,27 @@ def openf1(endpoint, **query):
     return json.loads(raw), {'id': endpoint, 'url': url, 'sha256': digest(raw)}
 
 
+def lap_snapshots(laps, positions, names):
+    """Sample reported order at earliest recorded lap start; not overtake detection."""
+    starts = {}
+    for lap in laps:
+        if lap.get('date_start'):
+            n = lap['lap_number']
+            t = datetime.fromisoformat(lap['date_start'])
+            starts[n] = min(starts.get(n, t), t)
+    updates = sorted(positions, key=lambda r: r['date'])
+    cursor, order, snapshots = 0, {}, []
+    for n, t in sorted(starts.items()):
+        while cursor < len(updates) and datetime.fromisoformat(updates[cursor]['date']) <= t:
+            r = updates[cursor]
+            order[r['driver_number']] = r['position']
+            cursor += 1
+        top = sorted(order.items(), key=lambda r: (r[1], r[0]))[:10]
+        snapshots.append({'lap': n, 'date': t.isoformat(), 'reportedTopTen': [
+            {'name': names.get(d, str(d)), 'position': p} for d, p in top]})
+    return snapshots
+
+
 def collect(race, results, directory):
     directory.mkdir(parents=True, exist_ok=True)
     sessions, source = openf1('sessions', **{'year': race['year'], 'session_name': 'Race', 'date_start>': race['date'], 'date_start<': race['date'] + 'T23:59:59'})
@@ -20,7 +41,7 @@ def collect(race, results, directory):
     key = sessions[0]['session_key']
     sources = [source]
     datasets = {}
-    for endpoint in ['laps', 'stints', 'pit', 'race_control', 'weather', 'team_radio', 'drivers']:
+    for endpoint in ['laps', 'stints', 'pit', 'race_control', 'weather', 'team_radio', 'drivers', 'position']:
         datasets[endpoint], source = openf1(endpoint, session_key=key)
         sources.append(source)
         (directory / f'{endpoint}.json').write_text(json.dumps(datasets[endpoint]))
@@ -60,7 +81,9 @@ def collect(race, results, directory):
                            'Neutralisation exclusion includes a conservative 120-second release buffer.',
                            'Deleted laps are not reconstructed in this initial metric; do not use medians as driver skill rankings.',
                            'Radio catalogue contains audio links only. No radio content has been transcribed or verified.',
-                           'No journalism ingested; narrative is derived from structured timing and race-control messages.'],
+                           'No journalism ingested; narrative is derived from structured timing and race-control messages.',
+                           'Lap snapshots sample reported top-ten positions at earliest recorded lap starts; updates may lag and changes do not prove on-track overtakes.'],
+            'lapByLap': lap_snapshots(datasets['laps'], datasets['position'], names),
             'lapMetrics': metrics, 'stints': datasets['stints'],
             'timeline': [{'date': r['date'], 'message': r['message']} for r in datasets['race_control']],
             'radioCount': len(datasets['team_radio'])}

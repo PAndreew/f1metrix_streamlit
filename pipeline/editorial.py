@@ -16,6 +16,7 @@ Explain the deterministic metrics qualitatively and acknowledge limitations.
 Forecasts are RETROSPECTIVE held-out reconstructions conditional on no technical retirement, NOT live predictions.
 Do not infer incident responsibility from retirement codes. Do not equate outcome surprise with driver skill.
 Radio links are not transcripts. Do not invent radio exchanges or use medians to claim controlled pace comparisons.
+Reported position changes and lap snapshots do not establish on-track overtakes.
 No claims that a different strategy certainly would have won. If evidence is insufficient say so.
 Use plain text paragraphs, concise but informative.'''
 

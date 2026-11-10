@@ -6,7 +6,7 @@
 - Checksummed SQLite ingestion, integrity validation and bounded ZIP extraction.
 - Full historical two-chain sequential NUTS fits, not ADVI. Fit diagnostics include driver/team latent effects as well as scale and career parameters.
 - Separate strictly-before-race fits and joint rank simulations for held-out comparisons. Shared uncertainty is preserved, including unseen constructor-season draws.
-- Structured OpenF1 lap, stint, pit, weather, race-control, driver and radio-link ingestion. No high-frequency bulk telemetry, journalism scraping or audio transcription in this first release.
+- Structured OpenF1 lap, stint, pit, weather, race-control, driver, position and radio-link ingestion, plus a derived lap-by-lap top-ten timeline. Position snapshots can lag and do not establish on-track overtakes. No high-frequency bulk telemetry, journalism scraping or audio transcription in this first release.
 - Hosted OpenRouter synthesis with a fixed prompt and bounded context/output. Every driver must be covered with known source IDs. All numbers appear in deterministic tables/charts, not LLM-generated prose.
 - Failed diagnostics or editorial validation prevent the publication commit. Existing public artifacts are left unchanged until a complete release is ready.
 - Static Vite frontend with Chart.js, local SQLite/WASM search/filter/sort/pagination, CSV downloads and accessible chart data tables. Existing Go application remains available and unchanged.
