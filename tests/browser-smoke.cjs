@@ -7,10 +7,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 (async () => {
   const browser = await chromium.launch({
     headless: true,
+    executablePath: process.env.BROWSER_EXECUTABLE || undefined,
     args: ["--no-sandbox"],
   });
+  const page = await browser.newPage();
   try {
-    const page = await browser.newPage();
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     const base = process.env.BASE_URL || "http://localhost:5178";
@@ -110,6 +111,22 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
     console.log(
       "Browser smoke passed: SQLite/WASM, search, empty state, pagination, mobile layout, article chart.",
     );
+  } catch (error) {
+    console.error(
+      "Browser state:",
+      await page.evaluate(() => ({
+        url: location.href,
+        search: document.querySelector("#search")?.value,
+        count: document.querySelector("#count")?.textContent,
+        status: document.querySelector("#db-status")?.textContent,
+        rows: document.querySelector("#rows")?.textContent,
+      })),
+    );
+    await page.screenshot({
+      path: "/tmp/f1metrix-browser-failure.png",
+      fullPage: true,
+    });
+    throw error;
   } finally {
     await browser.close();
   }
