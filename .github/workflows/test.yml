@@ -39,7 +39,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Browser smoke
         run: |
-          npm run dev:site -- --port 5178 > /tmp/f1metrix-site.log 2>&1 &
+          npm run preview:site -- --port 5178 > /tmp/f1metrix-site.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://localhost:5178 >/dev/null && break || sleep 1; done
           node tests/browser-smoke.cjs
       - uses: actions/setup-go@v5
